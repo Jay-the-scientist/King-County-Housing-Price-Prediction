@@ -1,104 +1,105 @@
 # King County Housing Price Prediction
-This project analyzes housing data from King County to build models for predicting home sale prices. The goal is to aid in real estate investment decisions. 
 
-## Objective
-As a data analyst at a real estate investment trust, I was tasked with determining factors that influence housing prices and developing predictive models. This will help assess markets and value of potential properties to purchase.
+**Exploring what influences home prices and using machine learning to estimate property values.**
 
-## Installation
-Install the required Python libraries with:
+## Overview
 
-```bash
-pip install pandas numpy matplotlib seaborn scikit-learn
-```
+What makes one home more expensive than another? Is it the size, location, condition, or a combination of several factors?
 
-## The Data
-The dataset contains over 21,000 home sale records for King County, WA between 2014-2015. Features include property details like bedrooms, bathrooms, square footage, building age, as well as location and sale date/price.
+This project explores those questions using data from **21,613 residential property sales in King County, Washington**, including the Seattle area.
 
-| Variable      | Description                                                                                                 |
-| ------------- | ----------------------------------------------------------------------------------------------------------- |
-| id            | A notation for a house                                                                                      |
-| date          | Date house was sold                                                                                         |
-| price         | Price is prediction target                                                                                  |
-| bedrooms      | Number of bedrooms                                                                                          |
-| bathrooms     | Number of bathrooms                                                                                         |
-| sqft_living   | Square footage of the home                                                                                  |
-| sqft_lot      | Square footage of the lot                                                                                   |
-| floors        | Total floors (levels) in house                                                                              |
-| waterfront    | House which has a view to a waterfront                                                                      |
-| view          | Has been viewed                                                                                             |
-| condition     | How good the condition is overall                                                                           |
-| grade         | overall grade given to the housing unit, based on King County grading system                                |
-| sqft_above    | Square footage of house apart from basement                                                                 |
-| sqft_basement | Square footage of the basement                                                                              |
-| yr_built      | Built Year                                                                                                  |
-| yr_renovated  | Year when house was renovated                                                                               |
-| zipcode       | Zip code                                                                                                    |
-| lat           | Latitude coordinate                                                                                         |
-| long          | Longitude coordinate                                                                                        |
-| sqft_living15 | Living room area in 2015(implies-- some renovations) This might or might not have affected the lotsize area |
-| sqft_lot15    | LotSize area in 2015(implies-- some renovations)       
+Using Python and machine learning, I analyzed housing characteristics, explored relationships between property features and sale prices, and compared regression models to see how well they could estimate home values.
 
-## Methodology
-Data preprocessing involved removing outliers, converting date values, and engineering new features like age of the home. Exploratory analysis identified strong correlations, especially between square footage and price. Models such as Linear Regression and Ridge Regression were trained and evaluated. Metrics like R² and RMSE were used to assess performance.
+## Dataset
 
-## Results
-### Living space (sqft_living) had the strongest correlation with price.
+The dataset contains homes sold between **May 2014 and May 2015**, with information about each property's sale price and characteristics.
 
-![](images/results-correlation-to-price-sorted.png)
+Some of the features explored include:
 
-### I trained a linear regression model based on square feet to predict price
-You can see the r2 score is not very accurate at .49
+- **Property size:** Living area, lot size, and number of floors
+- **Home features:** Bedrooms, bathrooms, and overall condition
+- **Location:** Geographic coordinates, ZIP codes, and waterfront status
+- **Property history:** Construction and renovation years
 
-![](images/results-linear-prediction-model-using-sqft.png)
+The goal was to understand which characteristics were most closely associated with housing prices and use those features to build predictive models.
 
-### So a linear regression model was trained using all the other features to predict price
-You can see that this model is much more accurate with an r2 score of .65
+## Exploring the Data
 
-![](images/results-linear-prediction-model-using-all-features.png)
+Before building the models, I explored the dataset to better understand the properties and prepare the information for analysis.
 
-### Then I made a pipeline to automate the process of preparing for machine learning
-The scaler standardizes features by removing the mean and scaling to unit variance. So instead of having numbers like [999,1000,1010], now you would have [.99, 1, 1.1]. It makes the processing easier for the system to handle and scale to large datasets.
+This included identifying missing values, removing unnecessary columns, examining property characteristics, and visualizing relationships between housing features and sale prices.
 
-Polynomial features generates new features that are combinations of the original features raised to a power. This allows the model to capture non-linear relationships.
+### Waterfront Properties and Sale Prices
 
-The Linear Regression to predict the price using the list of all other features. This could be switched with other sklearn estimators such as
-- Decision Trees: DecisionTreeRegressor or DecisionTreeClassifier
-- Random Forests: RandomForestRegressor or RandomForestClassifier
-- Support Vector Machines: SVR or SVC
-- Gradient Boosting: GradientBoostingRegressor or GradientBoostingClassifier
-- Neural Networks: MLPRegressor or MLPClassifier
+To explore how location-related features affect housing prices, I compared sale prices for waterfront and non-waterfront properties.
 
-  
-![](images/results-pipeline-to-scale-addpolynomialfeatures-dolinearregression.png)
+![Waterfront vs. Home Sale Prices](images/waterfront-v-salesprice.png)
 
-### Now the dataset was split into training and testing data. 
+### What Influences Housing Prices?
 
-![](images/results-splitdataset.png)
+Several property characteristics showed strong positive relationships with sale prices:
 
-### This time, a Ridge regression object was created and fit using the training data. 
-I set the regularization parameter to 0.1 and calculated the R^2 using the test data. The r2 score is higher at .64. 
-The regularization parameter, alpha=0.1, means that the model will apply a moderate penalty to the coefficients, helping to balance fitting the training data while avoiding overfitting.
+| Property Feature | Correlation with Price |
+|---|---:|
+| Living area | 0.702 |
+| Property grade | 0.667 |
+| Above-ground square footage | 0.606 |
+| Nearby homes' living area | 0.585 |
 
-When alpha is 0: The model behaves like standard linear regression without any regularization.
+**Key takeaway:** Larger homes and properties with higher construction grades generally tended to have higher sale prices in this dataset.
 
-When alpha is greater than 0: The model penalizes large coefficients. This means it will shrink the coefficients toward zero, which can help reduce overfitting by simplifying the model.
+![Living Area vs. Sale Price](images/livingarea-v-saleprice.png)
 
-![](images/results-ridge-model.png)
+## Building the Prediction Models
 
-### Lastly, I performed a second order polynomial transform on both the training data and testing data, created and fit a Ridge regression object using the training data, set the regularisation parameter to 0.1, and calculated the r2 utilising the test data.
-This model has proven to be the most accurate with an accuracy score of .70
+To estimate housing prices, I explored several regression techniques, starting with simpler models and then introducing additional features and complexity.
 
-![](images/results-ridge-model-second-order-polynomial-transform.png)
+The approaches included:
 
-### I ran the same code, but used a third order polynomial transform, but this resulted in a lower r2 score of .51
+- **Linear Regression:** Estimating prices from individual or multiple property characteristics
+- **Ridge Regression:** Applying regularization to a model using multiple housing features
+- **Polynomial Regression:** Capturing more complex relationships between property characteristics and sale prices
 
-![](images/results-ridge-model-third-order-polynomial-transform.png)
+The final evaluations used **85% of the data for training and 15% for testing**, allowing the models to be assessed on properties outside their training data.
 
-## Future Work
-Test advanced models like Gradient Boosting or XGBoost.
+## Model Performance
 
-Incorporate external features like school district or crime rates.
+The models were compared using **R²**, a metric that measures how much of the variation in home prices a model can explain. A higher R² generally indicates a better fit.
 
-Deploy as a web app to assist home buyers and agents.
+| Model | Test R² |
+|---|---:|
+| Ridge Regression | 0.648 |
+| Polynomial Ridge Regression (Degree 2) | **0.704** |
+| Polynomial Ridge Regression (Degree 3) | 0.516 |
 
+**Best result: R² = 0.704**
 
+The second-degree Polynomial Ridge Regression model performed best on the test data, explaining approximately **70.4% of the variation in sale prices**.
+
+Interestingly, increasing the polynomial degree to three reduced performance. This highlights an important lesson in predictive modeling: a more complex model does not necessarily make better predictions on new data.
+
+![Comparison of housing price regression models](images/model-comparison.png)
+
+## Technologies Used
+
+- **Python** — Data analysis and modeling
+- **Pandas & NumPy** — Data preparation and manipulation
+- **Matplotlib & Seaborn** — Data visualization
+- **scikit-learn** — Regression models, feature transformations, and evaluation
+- **Jupyter Notebook** — Interactive analysis and experimentation
+
+## Skills Demonstrated
+
+- Data cleaning and preparation
+- Exploratory data analysis and visualization
+- Correlation analysis
+- Feature selection and transformation
+- Linear and polynomial regression
+- Model evaluation and comparison
+- Interpreting machine learning results
+
+## Project Context
+
+This project was completed as part of the **IBM Data Science Professional Certificate**, providing hands-on experience with housing market analysis and regression modeling.
+
+The work demonstrates foundational machine learning and data analysis techniques using a real-world housing dataset.
