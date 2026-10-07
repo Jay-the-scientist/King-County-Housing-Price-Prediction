@@ -78,7 +78,7 @@ The second-degree Polynomial Ridge Regression model performed best on the test d
 
 Interestingly, increasing the polynomial degree to three reduced performance. This highlights an important lesson in predictive modeling: a more complex model does not necessarily make better predictions on new data.
 
-![Comparison of housing price regression models](images/model-comparison.png)
+![Comparison of housing price regression models](images/modelcomparison.png)
 
 ## Technologies Used
 
